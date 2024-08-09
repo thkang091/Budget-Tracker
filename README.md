@@ -5,7 +5,7 @@ A solo full-stack web application built with React, Tailwind CSS, Firebase, and 
 
 The budget tracker web application is live and can be accessed at:
 
-[https://budgettracking-73e00.web.app/dashboard](https://budgettracking-73e00.web.app/dashboard)
+[https://budgettracking-73e00.web.app/dashboard](https://budgettracking-73e00.web.app)
 
 ## Available Scripts
 
