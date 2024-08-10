@@ -127,6 +127,12 @@ const Profile = () => {
   const handleImageChange = (e) => {
     if (e.target.files[0]) {
       setProfileImage(e.target.files[0]);
+      // Preview the image
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setUserData(prev => ({ ...prev, photoURL: reader.result }));
+      };
+      reader.readAsDataURL(e.target.files[0]);
     }
   };
 
@@ -158,6 +164,7 @@ const Profile = () => {
 
       setSuccess('Profile updated successfully');
       setEditMode(false);
+      setProfileImage(null); // Reset the profileImage state
     } catch (error) {
       setError('Failed to update profile: ' + error.message);
     } finally {
@@ -609,7 +616,7 @@ const Profile = () => {
           <CardContent className="pt-6">
             <div className="flex flex-col items-center">
               <ProfileImage />
-              <h3 className="text-2xl font-semibold mb-2 text-indigo-700 dark:text-indigo-300">{userData.name}</h3>
+              <h3 className="text-2xl font-semibold mb-2 text-indigo-700 dark:text-white">{userData.name}</h3>
               <p className="text-gray-600 dark:text-gray-400 mb-6">@{userData.username}</p>
               {editMode ? <ProfileForm /> : <ProfileInfo />}
             </div>
