@@ -72,13 +72,15 @@ export function AuthProvider({ children }) {
         twoFactorEnabled: userData.enableTwoFactor,
         twoFactorMethod: userData.enableTwoFactor ? userData.twoFactorMethod : null,
         securityQuestions: userData.securityQuestions,
-        notificationPreferences: userData.notificationPreferences
+        notificationPreferences: userData.notificationPreferences,
+        isIncomeVerified: userData.hasIncome // Set isIncomeVerified based on hasIncome
       }, { merge: true });
       console.log('User document created in Firestore');
       
       const newUser = {
         ...userCredential.user,
-        hasIncome: userData.hasIncome
+        hasIncome: userData.hasIncome,
+        isIncomeVerified: userData.hasIncome
       };
       setCurrentUser(newUser);
       
@@ -102,7 +104,8 @@ export function AuthProvider({ children }) {
         const userData = userDocSnap.data();
         const newUser = {
           ...userCredential.user,
-          hasIncome: userData.hasIncome
+          hasIncome: userData.hasIncome,
+          isIncomeVerified: userData.isIncomeVerified
         };
         setCurrentUser(newUser);
         return newUser;
@@ -147,7 +150,8 @@ export function AuthProvider({ children }) {
         photoURL: data.photoURL,
         hasIncome: data.hasIncome,
         incomeAmount: data.hasIncome ? data.incomeAmount : null,
-        incomeFrequency: data.hasIncome ? data.incomeFrequency : null
+        incomeFrequency: data.hasIncome ? data.incomeFrequency : null,
+        isIncomeVerified: data.hasIncome
       };
 
       await updateDoc(userDocRef, updateData);
@@ -192,19 +196,50 @@ export function AuthProvider({ children }) {
           name: result.user.displayName,
           email: result.user.email,
           hasIncome: false,
+          isIncomeVerified: false,
           photoURL: result.user.photoURL
         });
       }
 
-      const userData = userDocSnap.exists() ? userDocSnap.data() : { hasIncome: false };
+      const userData = userDocSnap.exists() ? userDocSnap.data() : { hasIncome: false, isIncomeVerified: false };
       const newUser = {
         ...result.user,
-        hasIncome: userData.hasIncome
+        hasIncome: userData.hasIncome,
+        isIncomeVerified: userData.isIncomeVerified
       };
       setCurrentUser(newUser);
       return newUser;
     } catch (error) {
       console.error("Error in loginWithGoogle:", error);
+      throw error;
+    }
+  }
+
+  async function updateIncomeInfo(hasIncome, incomeAmount, incomeFrequency) {
+    try {
+      if (!currentUser) {
+        throw new Error("No user is currently logged in");
+      }
+
+      const userDocRef = doc(db, 'users', currentUser.uid);
+      const updateData = {
+        hasIncome,
+        incomeAmount: hasIncome ? incomeAmount : null,
+        incomeFrequency: hasIncome ? incomeFrequency : null,
+        isIncomeVerified: hasIncome
+      };
+
+      await updateDoc(userDocRef, updateData);
+
+      const updatedUser = {
+        ...currentUser,
+        ...updateData
+      };
+
+      setCurrentUser(updatedUser);
+      return updatedUser;
+    } catch (error) {
+      console.error("Error in updateIncomeInfo:", error);
       throw error;
     }
   }
@@ -221,7 +256,8 @@ export function AuthProvider({ children }) {
             const userData = userDocSnap.data();
             setCurrentUser({
               ...user,
-              hasIncome: userData.hasIncome
+              hasIncome: userData.hasIncome,
+              isIncomeVerified: userData.isIncomeVerified
             });
           } else {
             setCurrentUser(user);
@@ -251,7 +287,8 @@ export function AuthProvider({ children }) {
     updateUserProfile,
     loginWithGoogle,
     sendEmailVerification,
-    isOffline
+    isOffline,
+    updateIncomeInfo
   };
 
   return (
