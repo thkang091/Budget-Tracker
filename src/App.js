@@ -8,11 +8,10 @@ import Budgets from './pages/Budgets';
 import Goals from './pages/Goals';
 import Profile from './pages/Profile';
 import Login from './components/Login';
-import IncomeVerification from './components/IncomeVerification';
 import Signup from './components/Signup';
+import IncomeVerification from './components/IncomeVerification';
 import DashboardLayout from './components/DashboardLayout';
 import Income from './pages/Income';
-
 
 class ErrorBoundary extends React.Component {
   constructor(props) {
@@ -38,24 +37,33 @@ class ErrorBoundary extends React.Component {
 }
 
 const PrivateRoute = ({ children }) => {
-  const { currentUser } = useAuth();
-  console.log('PrivateRoute - currentUser:', currentUser);
-  return currentUser ? <DashboardLayout>{children}</DashboardLayout> : <Navigate to="/login" />;
+  const { currentUser, isIncomeVerified } = useAuth();
+  
+  if (!currentUser) {
+    return <Navigate to="/login" />;
+  }
+  
+  if (!currentUser.isIncomeVerified) {
+    return <Navigate to="/income-verification" />;
+  }
+  
+  return <DashboardLayout>{children}</DashboardLayout>;
 };
 
 function AppRoutes() {
   const { currentUser } = useAuth();
-  console.log('AppRoutes - currentUser:', currentUser);
 
   return (
     <Routes>
       <Route path="/login" element={
-        currentUser ? <Navigate to="/dashboard" /> : <Login />
+        currentUser ? (currentUser.isIncomeVerified ? <Navigate to="/dashboard" /> : <Navigate to="/income-verification" />) : <Login />
       } />
       <Route path="/signup" element={
-        currentUser ? <Navigate to="/dashboard" /> : <Signup />
+        currentUser ? (currentUser.isIncomeVerified ? <Navigate to="/dashboard" /> : <Navigate to="/income-verification" />) : <Signup />
       } />
-      <Route path="/income-verification" element={<IncomeVerification />} />
+      <Route path="/income-verification" element={
+        currentUser ? (currentUser.isIncomeVerified ? <Navigate to="/dashboard" /> : <IncomeVerification />) : <Navigate to="/login" />
+      } />
       <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
       <Route path="/expenses" element={<PrivateRoute><Expenses /></PrivateRoute>} />
       <Route path="/budgets" element={<PrivateRoute><Budgets /></PrivateRoute>} />
@@ -67,18 +75,15 @@ function AppRoutes() {
   );
 }
 
-
 function App() {
   return (
-    <ErrorBoundary>
-      <AuthProvider>
-        <FinanceProvider>
-            <Router>
-              <AppRoutes />
-            </Router>
-        </FinanceProvider>
-      </AuthProvider>
-    </ErrorBoundary>
+    <AuthProvider>
+      <FinanceProvider>
+        <Router>
+          <AppRoutes />
+        </Router>
+      </FinanceProvider>
+    </AuthProvider>
   );
 }
 
