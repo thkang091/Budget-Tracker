@@ -12,7 +12,7 @@ const Sidebar = ({ darkMode, setDarkMode }) => {
 
   const navItems = [
     { path: '/dashboard', icon: <BarChart2 size={20} />, label: 'Dashboard' },
-    ...(currentUser?.hasIncome ? [{ path: '/income', icon: <TrendingUp size={20} />, label: 'Income' }] : []),
+    ...(currentUser?.isIncomeVerified ? [{ path: '/income', icon: <TrendingUp size={20} />, label: 'Income' }] : []),
     { path: '/expenses', icon: <CreditCard size={20} />, label: 'Expenses' },
     { path: '/budgets', icon: <PiggyBank size={20} />, label: 'Budgets' },
     { path: '/goals', icon: <Target size={20} />, label: 'Goals' },
