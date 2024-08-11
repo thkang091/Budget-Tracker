@@ -67,21 +67,18 @@ export const FinanceProvider = ({ children }) => {
             date: doc.data().date.toDate()
           }));
           setExpenses(expensesData);
-          setLoading(false);
         }, (err) => {
           console.error("Error in expenses listener:", err);
           setError("Failed to update expenses in real-time. Please refresh the page.");
-          setLoading(false);
         });
-
+  
         return () => unsubscribe();
       } catch (err) {
         console.error("Error fetching expenses:", err);
         setError("Failed to fetch expenses. Please try again later.");
-        setLoading(false);
       }
     };
-
+  
     fetchExpenses();
   }, []);
 
@@ -93,14 +90,12 @@ export const FinanceProvider = ({ children }) => {
       if (docSnap.exists() && docSnap.data().categories) {
         setCategories(docSnap.data().categories);
       }
-      setLoading(false);
     };
-
+  
     if (auth.currentUser) {
       fetchCategories();
     }
   }, []);
-
   useEffect(() => {
     let unsubscribe = () => {};
   const fetchBudgets = async () => {
