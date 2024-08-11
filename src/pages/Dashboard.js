@@ -6,7 +6,7 @@ import { useAuth } from '../contexts/AuthContext';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import FinancialSummary from '../components/FinancialSummary';
-import Alert, {  AlertTitle, AlertDescription } from '../components/ui/Alert';
+import Alert, { AlertTitle, AlertDescription } from '../components/ui/Alert';
 import { exportToPDF, exportToExcel } from '../utils/exportUtils';
 
 const Dashboard = () => {
@@ -28,7 +28,6 @@ const Dashboard = () => {
     getInsights,
     getRecommendations,
     expenses,
-    loading,
     error
   } = useFinanceContext();
 
@@ -280,7 +279,7 @@ const Dashboard = () => {
         )}
       </div>
 
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden mb-6">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden mb-6">
         <SectionHeader title="Reports and Analytics" section="reportsAnalytics" />
         {expandedSections.reportsAnalytics && (
           <div className="p-6">
@@ -296,71 +295,62 @@ const Dashboard = () => {
               </select>
             </div>
             <div className="h-80">
-              {loading ? (
-                <div className="h-full flex items-center justify-center">
-                  <p className="text-gray-500 dark:text-gray-400">Loading...</p>
+              {selectedReport === 'spending' && pieChartData.length > 0 && (
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={pieChartData}
+                      cx="50%"
+                      cy="50%"
+                      labelLine={false}
+                      outerRadius={80}
+                      fill="#8884d8"
+                      dataKey="value"
+                      label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                    >
+                      {pieChartData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip formatter={(value) => formatCurrency(value, selectedCurrency)} />
+                    <Legend />
+                  </PieChart>
+                </ResponsiveContainer>
+              )}
+              {selectedReport === 'budget' && barChartData.length > 0 && (
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={barChartData}>
+                    <XAxis dataKey="name" />
+                    <YAxis />
+                    <Tooltip formatter={(value) => formatCurrency(value, selectedCurrency)} />
+                    <Legend />
+                    <Bar dataKey="budget" fill="#8884d8" name="Budget" />
+                    <Bar dataKey="expenses" fill="#82ca9d" name="Expenses" />
+                  </BarChart>
+                </ResponsiveContainer>
+              )}
+              {selectedReport === 'trend' && lineChartData.length > 0 && (
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={lineChartData}>
+                    <XAxis dataKey="name" />
+                    <YAxis />
+                    <Tooltip formatter={(value) => formatCurrency(value, selectedCurrency)} />
+                    <Legend />
+                    <Line type="monotone" dataKey="value" stroke="#8884d8" name="Expenses" />
+                  </LineChart>
+                </ResponsiveContainer>
+              )}
+              {((selectedReport === 'spending' && pieChartData.length === 0) ||
+                (selectedReport === 'budget' && barChartData.length === 0) ||
+                (selectedReport === 'trend' && lineChartData.length === 0)) && (
+                <div className="h-full flex items-center justify-center text-gray-500 dark:text-gray-400">
+                  No data available for the selected report type.
                 </div>
-              ) : (
-<>
-                  {selectedReport === 'spending' && pieChartData.length > 0 && (
-                    <ResponsiveContainer width="100%" height="100%">
-                      <PieChart>
-                        <Pie
-                          data={pieChartData}
-                          cx="50%"
-                          cy="50%"
-                          labelLine={false}
-                          outerRadius={80}
-                          fill="#8884d8"
-                          dataKey="value"
-                          label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                        >
-                          {pieChartData.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                          ))}
-                        </Pie>
-                        <Tooltip formatter={(value) => formatCurrency(value, selectedCurrency)} />
-                        <Legend />
-                      </PieChart>
-                    </ResponsiveContainer>
-                  )}
-                  {selectedReport === 'budget' && barChartData.length > 0 && (
-                    <ResponsiveContainer width="100%" height="100%">
-                      <BarChart data={barChartData}>
-                        <XAxis dataKey="name" />
-                        <YAxis />
-                        <Tooltip formatter={(value) => formatCurrency(value, selectedCurrency)} />
-                        <Legend />
-                        <Bar dataKey="budget" fill="#8884d8" name="Budget" />
-                        <Bar dataKey="expenses" fill="#82ca9d" name="Expenses" />
-                      </BarChart>
-                    </ResponsiveContainer>
-                  )}
-                  {selectedReport === 'trend' && lineChartData.length > 0 && (
-                    <ResponsiveContainer width="100%" height="100%">
-                      <LineChart data={lineChartData}>
-                        <XAxis dataKey="name" />
-                        <YAxis />
-                        <Tooltip formatter={(value) => formatCurrency(value, selectedCurrency)} />
-                        <Legend />
-                        <Line type="monotone" dataKey="value" stroke="#8884d8" name="Expenses" />
-                      </LineChart>
-                    </ResponsiveContainer>
-                  )}
-                  {((selectedReport === 'spending' && pieChartData.length === 0) ||
-                    (selectedReport === 'budget' && barChartData.length === 0) ||
-                    (selectedReport === 'trend' && lineChartData.length === 0)) && (
-                    <div className="h-full flex items-center justify-center text-gray-500 dark:text-gray-400">
-                      No data available for the selected report type.
-                    </div>
-                  )}
-                </>
               )}
             </div>
           </div>
         )}
       </div>
-
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
           <SectionHeader title="Expense Prediction" section="predictions" />
