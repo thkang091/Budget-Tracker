@@ -8,18 +8,15 @@ export default function IncomeVerification() {
   const [incomeAmount, setIncomeAmount] = useState('');
   const [incomeFrequency, setIncomeFrequency] = useState('monthly');
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
-  const { updateIncomeInfo, currentUser } = useAuth();
+  const { updateIncomeInfo } = useAuth();
   const navigate = useNavigate();
 
   async function handleSubmit(e) {
     e.preventDefault();
     setError('');
-    setLoading(true);
 
     if (hasIncome && (!incomeAmount || isNaN(incomeAmount) || incomeAmount <= 0)) {
       setError('Please enter a valid income amount.');
-      setLoading(false);
       return;
     }
 
@@ -30,8 +27,6 @@ export default function IncomeVerification() {
       console.error('Income verification error:', error);
       setError('Failed to update income information. Please try again.');
     }
-
-    setLoading(false);
   }
 
   return (
@@ -101,10 +96,9 @@ export default function IncomeVerification() {
           <div>
             <button
               type="submit"
-              className={`group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
-              disabled={loading}
+              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
             >
-              {loading ? 'Submitting...' : 'Submit Income Information'}
+              Submit
             </button>
           </div>
         </form>
