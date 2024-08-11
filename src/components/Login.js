@@ -8,7 +8,6 @@ export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const { login, loginWithGoogle, resetPassword } = useAuth();
   const { updateUser } = useFinanceContext();
@@ -19,7 +18,6 @@ export default function Login() {
 
     try {
       setError('');
-      setLoading(true);
       await login(email, password);
       navigate('/dashboard');
     } catch (error) {
@@ -30,21 +28,17 @@ export default function Login() {
         setError('Failed to log in: ' + error.message);
       }
     }
-
-    setLoading(false);
   }
 
   async function handleGoogleLogin() {
     try {
       setError('');
-      setLoading(true);
       const user = await loginWithGoogle();
       updateUser(user);
       navigate('/dashboard');
     } catch (error) {
       setError('Failed to log in with Google: ' + error.message);
     }
-    setLoading(false);
   }
 
   async function handleForgotPassword(e) {
@@ -55,14 +49,12 @@ export default function Login() {
     }
     try {
       setError('');
-      setLoading(true);
       await resetPassword(email);
       setShowForgotPassword(false);
       alert('Password reset email sent. Check your inbox.');
     } catch (error) {
       setError('Failed to reset password: ' + error.message);
     }
-    setLoading(false);
   }
 
   return (
@@ -139,10 +131,9 @@ export default function Login() {
           <div>
             <button
               type="submit"
-              disabled={loading}
               className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
             >
-              {loading ? 'Signing in...' : 'Sign in'}
+              Sign in
             </button>
           </div>
         </form>
@@ -159,10 +150,9 @@ export default function Login() {
             />
             <button
               type="submit"
-              disabled={loading}
               className="mt-3 w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
             >
-              {loading ? 'Sending...' : 'Reset Password'}
+              Reset Password
             </button>
           </form>
         )}
