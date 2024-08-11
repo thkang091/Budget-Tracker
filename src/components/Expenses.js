@@ -15,7 +15,6 @@ const currencySymbols = {
 const Expenses = () => {
   const { 
     expenses, 
-    loading, 
     error, 
     getTotalExpenses, 
     getExpensesByCategory,
@@ -69,14 +68,6 @@ const Expenses = () => {
     sortOrder === 'desc' ? b[1] - a[1] : a[1] - b[1]
   );
 
-  if (loading) {
-    return (
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-        className="p-6 bg-gray-100 dark:bg-gray-900 rounded-lg shadow-lg">
-        <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200">Loading...</h2>
-      </motion.div>
-    );
-  }
 
   if (error) {
     return (
